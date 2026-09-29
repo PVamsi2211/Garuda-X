@@ -1,0 +1,6 @@
+account_id,company_name,mrr,login_velocity_delta_30d,contract_days_remaining,seat_utilization,open_p1_tickets
+ACC-001,Acme Corp,24000,-0.42,28,0.54,2
+ACC-002,Northstar Labs,12000,0.08,180,0.81,0
+ACC-003,Vertex Systems,38000,-0.31,45,0.63,1
+ACC-004,Orbit Cloud,9000,0.22,240,0.88,0
+ACC-005,BluePeak AI,17500,-0.55,21,0.47,3
