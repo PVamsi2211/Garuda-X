@@ -1,0 +1,7 @@
+account_id,date,interaction_type,text
+ACC-001,2026-09-20,Support,"Customer reported recurring production issues and reduced platform usage."
+ACC-001,2026-09-24,Renewal,"Customer asked whether renewal terms can be changed due to unresolved issues."
+ACC-002,2026-09-18,Success,"Customer reported successful rollout to two additional teams."
+ACC-003,2026-09-22,Meeting,"Stakeholder raised concerns about adoption and unresolved support requests."
+ACC-004,2026-09-21,Success,"Usage remains stable and customer expanded active seats."
+ACC-005,2026-09-25,Renewal,"Renewal discussion is stalled while customer evaluates alternatives."
