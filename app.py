@@ -15,7 +15,8 @@ def main() -> None:
     if st.session_state.pop("navigate_to_command_center", False):
         st.session_state["navigation_page"] = "Command Center"
     with st.sidebar:
-        st.markdown("# GARUDA-X")
+        st.image("assets/garuda_x_mark.svg", width=190)
+        st.markdown("### GARUDA-X")
         st.caption("AI-Powered Customer Risk & Revenue Decision Engine")
         st.divider()
         page = st.radio("Navigation", ["Command Center", "Accounts", "Decisions", "Data", "Audit Log"], key="navigation_page", label_visibility="collapsed")

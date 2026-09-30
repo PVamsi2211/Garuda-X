@@ -1,5 +1,9 @@
 # GARUDA-X
 
+<p align="center">
+  <img src="assets/garuda_x_logo.svg" alt="GARUDA-X eagle logo" width="760">
+</p>
+
 **AI-Powered Customer Risk & Revenue Decision Engine**
 
 GARUDA-X predicts next-month customer churn risk from structured business data, estimates revenue at risk, explains model signals, retrieves CRM evidence when it can be matched to an account, and creates deterministic playbook recommendations for human review. It is a business decision engine, not a chatbot. It never performs a customer-facing action.
