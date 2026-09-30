@@ -7,12 +7,20 @@ import streamlit as st
 from src.application import MonthlyAnalysis
 from ui.components.layout import page_header
 from ui.components.tables import render_priority_table
+from ui.components.upload_analysis import render_analysis_uploader
 
 
 def render_dashboard(analysis: MonthlyAnalysis | None, service: object) -> None:
     page_header("Command Center", "Customer risk and revenue exposure for the selected reporting month.")
     if analysis is None:
-        st.info("Load a model-compatible CSV or Parquet file in Data, then run an analysis to populate the command center.")
+        with st.container(border=True):
+            st.markdown("#### START YOUR ANALYSIS")
+            st.write("Upload a user-month business dataset to generate customer risk and revenue insights.")
+            features = st.columns(2)
+            features[0].markdown("**Churn risk**  ·  **Revenue at risk**  ·  **Explainable risk drivers**")
+            features[1].markdown("**Supporting business evidence**  ·  **Decision playbooks**")
+            st.caption("CSV or Parquet · Analysis runs only after you select a reporting month and click Run analysis.")
+            render_analysis_uploader(compact=True)
         return
     records = analysis.records
     decisions = service.list_decisions()
