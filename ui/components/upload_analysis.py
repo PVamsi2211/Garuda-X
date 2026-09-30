@@ -33,9 +33,6 @@ def render_analysis_uploader(*, compact: bool = False, after_upload: Callable[[]
                 st.session_state["upload_error"] = f"File could not be loaded ({type(error).__name__}). Check the file format and app logs."
         else:
             st.session_state["business_data_name"] = upload.name
-    elif st.session_state.get("business_data_signature"):
-        _invalidate_business_session()
-        st.session_state["business_dataset_changed_notice"] = True
     if st.session_state.pop("business_dataset_changed_notice", False):
         st.session_state["business_dataset_changed_message"] = True
         st.rerun()
