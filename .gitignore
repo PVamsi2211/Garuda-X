@@ -67,3 +67,6 @@ Thumbs.db
 !models/transformer/
 !models/transformer/all-MiniLM-L6-v2-deploy/
 !models/transformer/all-MiniLM-L6-v2-deploy/**
+!models/xgboost_model/model_metadata.json
+!models/xgboost_model/preprocessing_pipeline.joblib
+!models/xgboost_model/xgboost_churn_model.json

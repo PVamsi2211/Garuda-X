@@ -149,11 +149,12 @@ def _validate_frame(
     expected_types: Mapping[str, str] | None = None,
     target_values: Mapping[str, set[object]] | None = None,
     numeric_ranges: Mapping[str, tuple[float | None, float | None]] | None = None,
+    nullable_columns: set[str] | frozenset[str] = frozenset(),
 ) -> ValidationReport:
     report = ValidationReport(dataset_name=dataset_name)
     report.missing_required_columns = sorted(set(required) - set(frame.columns))
     report.null_counts = {column: int(count) for column, count in frame.isna().sum().items()}
-    critical_columns = set(required) | set(target_values or {})
+    critical_columns = (set(required) - set(nullable_columns)) | set(target_values or {})
     report.non_nullable_null_counts = {
         column: count
         for column, count in report.null_counts.items()
@@ -241,6 +242,49 @@ def validate_synthetic_monthly(frame: pd.DataFrame) -> ValidationReport:
         expected_types=expected,
         target_values={"churned_next_month": {0, 1}},
         numeric_ranges=ranges,
+    )
+
+
+def validate_prediction_monthly(frame: pd.DataFrame) -> ValidationReport:
+    """Validate unlabeled user-month rows for next-month churn inference."""
+    feature_list: tuple[str, ...] = (
+        "mrr",
+        "sessions",
+        "feature_usage_score",
+        "support_tickets",
+        "payment_failures",
+        "nps_score",
+        "product_incident",
+        "active_seats",
+        "tenure_month",
+        "plan_type",
+    )
+    required = ("user_id", "month", *feature_list)
+    expected = {
+        "user_id": "text",
+        "month": "date",
+        **{column: "numeric" for column in feature_list if column != "plan_type"},
+        "plan_type": "text",
+    }
+    ranges = {
+        "mrr": (0, None),
+        "sessions": (0, None),
+        "feature_usage_score": (0, 100),
+        "support_tickets": (0, None),
+        "payment_failures": (0, None),
+        "nps_score": (0, 10),
+        "product_incident": (0, 1),
+        "active_seats": (0, None),
+        "tenure_month": (0, None),
+    }
+    return _validate_frame(
+        frame,
+        dataset_name="monthly prediction dataset",
+        required=required,
+        unique_keys=(("user_id", "month"),),
+        expected_types=expected,
+        numeric_ranges=ranges,
+        nullable_columns=set(feature_list) - {"mrr"},
     )
 
 

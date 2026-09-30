@@ -1,0 +1,190 @@
+{
+  "model_name": "GARUDA-X XGBoost Next-Month Churn Risk",
+  "model_version": "1.0.0-stage3-baseline",
+  "training_timestamp_utc": "2026-09-29T19:33:55.037866+00:00",
+  "dataset_path": "data/synthetic-saas-churn/user_monthly.parquet",
+  "total_records": 79817,
+  "customer_count": 5000,
+  "target_column": "churned_next_month",
+  "target_interpretation": "1 means churn in the next month; 0 means no next-month churn",
+  "feature_list": [
+    "mrr",
+    "sessions",
+    "feature_usage_score",
+    "support_tickets",
+    "payment_failures",
+    "nps_score",
+    "product_incident",
+    "active_seats",
+    "tenure_month",
+    "plan_type"
+  ],
+  "feature_count": 10,
+  "numeric_features": [
+    "mrr",
+    "sessions",
+    "feature_usage_score",
+    "support_tickets",
+    "payment_failures",
+    "nps_score",
+    "product_incident",
+    "active_seats",
+    "tenure_month"
+  ],
+  "categorical_features": [
+    "plan_type"
+  ],
+  "preprocessing": {
+    "numeric": "passthrough; no numeric imputation or scaling",
+    "categorical": "constant missing-category token then OneHotEncoder(handle_unknown='ignore')",
+    "fitted_on": "training partition only",
+    "numeric_missing_values": "left as NaN for XGBoost native handling",
+    "categorical_missing_values": "encoded as an explicit __MISSING__ category",
+    "transformed_feature_order": [
+      "mrr",
+      "sessions",
+      "feature_usage_score",
+      "support_tickets",
+      "payment_failures",
+      "nps_score",
+      "product_incident",
+      "active_seats",
+      "tenure_month",
+      "plan_type_business",
+      "plan_type_enterprise",
+      "plan_type_pro",
+      "plan_type_starter"
+    ]
+  },
+  "random_seed": 42,
+  "model_parameters": {
+    "objective": "binary:logistic",
+    "eval_metric": "aucpr",
+    "n_estimators": 400,
+    "learning_rate": 0.05,
+    "max_depth": 4,
+    "min_child_weight": 5,
+    "subsample": 0.8,
+    "colsample_bytree": 0.8,
+    "reg_alpha": 0.05,
+    "reg_lambda": 1.0,
+    "scale_pos_weight": 76.10614525139665,
+    "random_state": 42,
+    "n_jobs": 1,
+    "tree_method": "hist",
+    "device": "cpu",
+    "early_stopping_rounds": 35,
+    "verbosity": 0
+  },
+  "scale_pos_weight": 76.10614525139665,
+  "split_method": "chronological complete-month partitions; no random row split",
+  "splits": {
+    "train": {
+      "start_date": "2024-01-01",
+      "end_date": "2025-06-01",
+      "rows": 55208,
+      "positive": 716,
+      "negative": 54492,
+      "positive_prevalence": 0.01296913490798435
+    },
+    "validation": {
+      "start_date": "2025-07-01",
+      "end_date": "2025-09-01",
+      "rows": 12610,
+      "positive": 209,
+      "negative": 12401,
+      "positive_prevalence": 0.016574147501982554
+    },
+    "test": {
+      "start_date": "2025-10-01",
+      "end_date": "2025-12-01",
+      "rows": 11999,
+      "positive": 131,
+      "negative": 11868,
+      "positive_prevalence": 0.010917576464705392
+    }
+  },
+  "overall_positive_count": 1056,
+  "overall_negative_count": 78761,
+  "overall_positive_prevalence": 0.01323026422942481,
+  "validation_metrics": {
+    "roc_auc": 0.7940384495925432,
+    "pr_auc": 0.05781011740880851,
+    "precision": 0.04007725736359247,
+    "recall": 0.7942583732057417,
+    "f1": 0.07630429786256034,
+    "confusion_matrix": [
+      [
+        8425,
+        3976
+      ],
+      [
+        43,
+        166
+      ]
+    ],
+    "positive_support": 209,
+    "negative_support": 12401,
+    "positive_prevalence": 0.016574147501982554,
+    "threshold": 0.5,
+    "pr_auc_definition": "average precision"
+  },
+  "final_test_metrics": {
+    "roc_auc": 0.7912492249348432,
+    "pr_auc": 0.03655772541005737,
+    "precision": 0.024993874050477823,
+    "recall": 0.7786259541984732,
+    "f1": 0.04843304843304843,
+    "confusion_matrix": [
+      [
+        7889,
+        3979
+      ],
+      [
+        29,
+        102
+      ]
+    ],
+    "positive_support": 131,
+    "negative_support": 11868,
+    "positive_prevalence": 0.010917576464705392,
+    "threshold": 0.5,
+    "pr_auc_definition": "average precision"
+  },
+  "evaluation_probability_threshold": 0.5,
+  "selected_business_probability_threshold": null,
+  "threshold_note": "0.50 is used only for initial classification metrics; it is not selected as an optimal business threshold.",
+  "risk_thresholds": {
+    "medium_threshold": 0.3,
+    "high_threshold": 0.7,
+    "note": "Configurable initial business bands, not statistically optimized."
+  },
+  "early_stopping": {
+    "enabled": true,
+    "rounds": 35,
+    "best_iteration": 15,
+    "best_validation_metric": 0.05809644443467014,
+    "validation_metric_name": "aucpr"
+  },
+  "calibration": {
+    "calibrated": false,
+    "brier_score": null,
+    "note": "No probability calibration was performed; Brier score was not calculated."
+  },
+  "software_versions": {
+    "python": "3.11.8",
+    "xgboost": "3.2.0",
+    "scikit_learn": "1.8.0",
+    "pandas": "2.3.3",
+    "numpy": "2.4.1",
+    "joblib": "1.5.3"
+  },
+  "artifacts": {
+    "model": "xgboost_churn_model.json",
+    "preprocessor": "preprocessing_pipeline.joblib",
+    "metadata": "model_metadata.json",
+    "model_path": "models/xgboost_model/xgboost_churn_model.json",
+    "preprocessor_path": "models/xgboost_model/preprocessing_pipeline.joblib",
+    "metadata_path": "models/xgboost_model/model_metadata.json"
+  }
+}
