@@ -66,9 +66,6 @@ def render_crm_uploader() -> None:
                 st.session_state["crm_upload_error"] = f"CRM file could not be loaded ({type(error).__name__}). Confirm it is valid JSONL."
         else:
             st.session_state["crm_data_name"] = upload.name
-    elif st.session_state.get("crm_data_signature"):
-        _invalidate_crm_session()
-        st.session_state["crm_dataset_changed_notice"] = True
     if st.session_state.pop("crm_dataset_changed_notice", False):
         st.session_state["crm_dataset_changed_message"] = True
         st.rerun()
