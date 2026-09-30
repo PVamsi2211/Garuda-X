@@ -12,12 +12,17 @@ from ui.runtime import get_decision_service
 def main() -> None:
     st.set_page_config(page_title="GARUDA-X | Decision Engine", page_icon="🛡️", layout="wide", initial_sidebar_state="expanded")
     st.markdown("<style>.stApp{background:#111315}.block-container{max-width:1440px;padding-top:2.75rem;padding-bottom:3rem}.gx-eyebrow{color:#d6ad58;font-size:.72rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;margin:0 0 .25rem}.gx-subtitle{color:#aab0b7;margin:0 0 1.6rem}.stMetric{background:#1a1d20;border:1px solid #303337;border-radius:12px;padding:1rem 1.1rem}.stMetric label{color:#adb3ba}.stMetric [data-testid=stMetricValue]{color:#f1f2f3}.stButton>button[kind=primary]{background:#bd9442;border-color:#bd9442;color:#111315}.stButton>button[kind=primary]:hover{background:#d2ab5e;border-color:#d2ab5e;color:#111315}[data-testid=stSidebar]{background:#17191b;border-right:1px solid #303337}</style>", unsafe_allow_html=True)
+    if st.session_state.pop("navigate_to_command_center", False):
+        st.session_state["navigation_page"] = "Command Center"
     with st.sidebar:
         st.markdown("# GARUDA-X")
         st.caption("AI-Powered Customer Risk & Revenue Decision Engine")
         st.divider()
-        page = st.radio("Navigation", ["Command Center", "Accounts", "Decisions", "Data", "Audit Log"], label_visibility="collapsed")
-        if st.session_state.get("model_error"):
+        page = st.radio("Navigation", ["Command Center", "Accounts", "Decisions", "Data", "Audit Log"], key="navigation_page", label_visibility="collapsed")
+        if st.session_state.get("analysis") is None:
+            st.info("Awaiting analysis")
+            st.caption("Models load on demand when a dataset is analyzed.")
+        elif st.session_state.get("model_error"):
             st.error("System Degraded")
             st.caption(st.session_state["model_error"])
         elif st.session_state.get("models_loaded"):
@@ -45,3 +50,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

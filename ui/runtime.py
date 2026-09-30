@@ -24,7 +24,7 @@ def get_analysis_resources() -> tuple[ChurnPredictor, ShapEngine, object]:
 
 
 @st.cache_resource(show_spinner="Preparing account-scoped CRM retrieval...")
-def get_crm_index() -> CRMEmbeddingIndex:
+def _get_default_crm_index() -> CRMEmbeddingIndex:
     _, _, embedding_model = get_analysis_resources()
     if DEFAULT_CRM_PATH.is_file():
         records = load_crm_records(DEFAULT_CRM_PATH)
@@ -33,18 +33,45 @@ def get_crm_index() -> CRMEmbeddingIndex:
     return CRMEmbeddingIndex(records, model=embedding_model)
 
 
+def get_crm_index() -> CRMEmbeddingIndex:
+    signature = st.session_state.get("crm_data_signature")
+    if signature:
+        if st.session_state.get("crm_index_signature") == signature:
+            cached = st.session_state.get("crm_index")
+            if isinstance(cached, CRMEmbeddingIndex):
+                return cached
+        _, _, embedding_model = get_analysis_resources()
+        uploaded = st.session_state.get("crm_data")
+        if st.session_state.get("crm_data_valid") and isinstance(uploaded, pd.DataFrame):
+            index = CRMEmbeddingIndex(normalize_crm_dates(uploaded), model=embedding_model)
+        else:
+            index = CRMEmbeddingIndex(pd.DataFrame(columns=["user_id", "text"]), model=embedding_model)
+        st.session_state["crm_index"] = index
+        st.session_state["crm_index_signature"] = signature
+        return index
+    return _get_default_crm_index()
+
+
 @st.cache_data(show_spinner=False)
 def load_uploaded_dataset(payload: bytes, filename: str) -> pd.DataFrame:
     suffix = Path(filename).suffix.lower()
-    if suffix not in {".csv", ".parquet"}:
-        raise ValueError("Only CSV and Parquet uploads are supported")
+    if suffix not in {".csv", ".parquet", ".jsonl"}:
+        raise ValueError("Only CSV, Parquet, and JSONL uploads are supported")
     with tempfile.TemporaryDirectory(prefix="garuda_x_upload_") as directory:
         path = Path(directory) / f"upload{suffix}"
         path.write_bytes(payload)
         return load_data(path)
 
 
+def normalize_crm_dates(records: pd.DataFrame) -> pd.DataFrame:
+    normalized = records.copy()
+    if "date" in normalized.columns:
+        normalized["date"] = pd.to_datetime(normalized["date"], errors="coerce", utc=True)
+    return normalized
+
+
 def get_decision_service() -> DecisionService:
     if "decision_service" not in st.session_state:
         st.session_state["decision_service"] = DecisionService(audit_logger=AuditLogger())
     return st.session_state["decision_service"]
+

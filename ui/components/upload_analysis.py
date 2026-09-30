@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import logging
+from collections.abc import Callable
 
 import pandas as pd
 import streamlit as st
@@ -13,17 +14,14 @@ from ui.runtime import get_analysis_resources, load_uploaded_dataset
 logger = logging.getLogger(__name__)
 
 
-def render_analysis_uploader(*, compact: bool = False) -> None:
+def render_analysis_uploader(*, compact: bool = False, after_upload: Callable[[], None] | None = None) -> None:
     upload = st.file_uploader("Upload structured business data", type=["csv", "parquet"], key="business_upload")
     if upload is not None:
         payload = upload.getvalue()
         signature = hashlib.sha256(payload).hexdigest()
         if st.session_state.get("business_data_signature") != signature:
-            st.session_state.pop("business_data", None)
-            st.session_state.pop("business_data_name", None)
-            st.session_state.pop("business_data_signature", None)
-            st.session_state.pop("analysis", None)
-            st.session_state.pop("analysis_month", None)
+            _invalidate_business_session()
+            st.session_state["business_dataset_changed_notice"] = True
             try:
                 st.session_state["business_data"] = load_uploaded_dataset(payload, upload.name)
                 st.session_state["business_data_name"] = upload.name
@@ -35,6 +33,16 @@ def render_analysis_uploader(*, compact: bool = False) -> None:
                 st.session_state["upload_error"] = f"File could not be loaded ({type(error).__name__}). Check the file format and app logs."
         else:
             st.session_state["business_data_name"] = upload.name
+    elif st.session_state.get("business_data_signature"):
+        _invalidate_business_session()
+        st.session_state["business_dataset_changed_notice"] = True
+    if st.session_state.pop("business_dataset_changed_notice", False):
+        st.session_state["business_dataset_changed_message"] = True
+        st.rerun()
+    if after_upload is not None:
+        after_upload()
+    if st.session_state.pop("business_dataset_changed_message", False):
+        st.info("Dataset changed. Run analysis again.")
     if st.session_state.get("upload_error"):
         st.error(st.session_state["upload_error"])
     frame = st.session_state.get("business_data")
@@ -90,10 +98,36 @@ def render_analysis_uploader(*, compact: bool = False) -> None:
             st.session_state["analysis_month"] = month_label
             st.session_state["models_loaded"] = True
             st.session_state.pop("model_error", None)
+            st.session_state["analysis_completed_message"] = f"Analysis completed — {len(analysis.records):,} accounts scored for {pd.Timestamp(month_label).strftime('%b %Y')}."
+            st.session_state["navigate_to_command_center"] = True
             analysis_succeeded = True
+        except (ValueError, TypeError) as error:
+            logger.exception("GARUDA-X rejected uploaded analysis input")
+            st.session_state["model_error"] = f"Analysis input failure ({type(error).__name__})."
+            st.error(f"Analysis failed: {error}")
         except Exception as error:
             logger.exception("GARUDA-X analysis failed")
             st.session_state["model_error"] = f"Analysis resource failure ({type(error).__name__}); check app logs."
             st.error(f"Analysis failed ({type(error).__name__}). Check the input schema, required model files, and app logs.")
         if analysis_succeeded:
             st.rerun()
+
+
+def _invalidate_business_session() -> None:
+    for key in (
+        "business_data",
+        "business_data_name",
+        "business_data_signature",
+        "analysis",
+        "analysis_month",
+        "analysis_reporting_month",
+        "analysis_completed_message",
+        "focused_decision_id",
+        "selected_account",
+        "models_loaded",
+        "decision_service",
+        "decision_reporting_periods",
+        "model_error",
+    ):
+        st.session_state.pop(key, None)
+

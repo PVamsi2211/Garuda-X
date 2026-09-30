@@ -12,6 +12,9 @@ from ui.components.upload_analysis import render_analysis_uploader
 
 def render_dashboard(analysis: MonthlyAnalysis | None, service: object) -> None:
     page_header("Command Center", "Customer risk and revenue exposure for the selected reporting month.")
+    completion_message = st.session_state.pop("analysis_completed_message", None)
+    if completion_message:
+        st.success(completion_message)
     if analysis is None:
         with st.container(border=True):
             st.markdown("#### START YOUR ANALYSIS")
@@ -46,8 +49,10 @@ def render_dashboard(analysis: MonthlyAnalysis | None, service: object) -> None:
     with right:
         st.subheader("Risk distribution")
         counts = records["risk_band"].value_counts().reindex(["high", "medium", "low"], fill_value=0).rename_axis("risk_band").reset_index(name="accounts")
-        chart = px.bar(counts, x="risk_band", y="accounts", color="risk_band", color_discrete_map={"low": "#8da39b", "medium": "#d6a84b", "high": "#e47767"}, labels={"risk_band": "Risk band", "accounts": "Accounts"})
+        chart = px.bar(counts, x="risk_band", y="accounts", color="risk_band", text="accounts", color_discrete_map={"low": "#8da39b", "medium": "#d6a84b", "high": "#e47767"}, labels={"risk_band": "Risk band", "accounts": "Accounts"})
+        chart.update_traces(textposition="outside", cliponaxis=False)
         chart.update_layout(template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", showlegend=False, margin=dict(l=8, r=8, t=8, b=8))
         st.plotly_chart(chart, use_container_width=True)
     st.subheader("Priority accounts")
     render_priority_table(records, decisions)
+
