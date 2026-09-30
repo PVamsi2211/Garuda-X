@@ -5,6 +5,7 @@ import plotly.express as px
 import streamlit as st
 
 from src.application import MonthlyAnalysis
+from ui.components.crm_upload import render_crm_uploader
 from ui.components.layout import page_header
 from ui.components.tables import render_priority_table
 from ui.components.upload_analysis import render_analysis_uploader
@@ -23,7 +24,7 @@ def render_dashboard(analysis: MonthlyAnalysis | None, service: object) -> None:
             features[0].markdown("**Churn risk**  ·  **Revenue at risk**  ·  **Explainable risk drivers**")
             features[1].markdown("**Supporting business evidence**  ·  **Decision playbooks**")
             st.caption("CSV or Parquet · Analysis runs only after you select a reporting month and click Run analysis.")
-            render_analysis_uploader(compact=True)
+            render_analysis_uploader(compact=True, after_upload=render_crm_uploader)
         return
     records = analysis.records
     decisions = service.list_decisions()
