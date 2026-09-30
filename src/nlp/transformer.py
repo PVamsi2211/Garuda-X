@@ -7,7 +7,7 @@ from typing import Sequence
 import numpy as np
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_MODEL_PATH = PROJECT_ROOT / "models" / "transformer" / "all-MiniLM-L6-v2"
+DEFAULT_MODEL_PATH = PROJECT_ROOT / "models" / "transformer" / "all-MiniLM-L6-v2-deploy"
 
 
 def normalize_embedding_text(text: str) -> str:

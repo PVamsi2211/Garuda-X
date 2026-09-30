@@ -62,3 +62,8 @@ Thumbs.db
 .history/
 *.swp
 *.swo
+
+# GARUDA-X deployment model
+!models/transformer/
+!models/transformer/all-MiniLM-L6-v2-deploy/
+!models/transformer/all-MiniLM-L6-v2-deploy/**
