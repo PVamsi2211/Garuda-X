@@ -1,7 +1,7 @@
 # GARUDA-X
 
 <p align="center">
-  <img src="assets/garuda_x_logo.svg" alt="GARUDA-X eagle logo" width="760">
+  <img src="assets/Garuda-x logo.png" alt="GARUDA-X eagle logo" width="760">
 </p>
 
 **AI-Powered Customer Risk & Revenue Decision Engine**
